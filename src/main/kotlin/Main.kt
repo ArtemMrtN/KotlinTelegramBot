@@ -26,7 +26,7 @@ fun main() {
         val answer = readln().toIntOrNull()
         when (answer) {
             1 -> println("Выбран пункт меню – Учить слова")
-            2 -> println("Выбран пункт меню – Статистика")
+            2 -> showStatistics(dictionary)
             0 -> return
             else -> println("Введите число 1, 2 или 0")
         }
@@ -44,4 +44,15 @@ fun loadDictionary(wordsFile: File): MutableList<Word> {
         dictionary.add(word)
     }
     return dictionary
+}
+
+fun showStatistics(mutableList: MutableList<Word>) {
+    val totalCount = mutableList.size
+
+    val learnedWordList = mutableList.filter { it.correctAnswersCount >= 3 }
+    val learnedCount = learnedWordList.size
+
+    val percent = learnedCount.toDouble() / totalCount.toDouble() * 100
+
+    println("Выучено $learnedCount из $totalCount слов | ${percent.toInt()}%\n")
 }
