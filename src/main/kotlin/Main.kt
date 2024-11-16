@@ -70,9 +70,8 @@ fun learnWord(dictionary: List<Word>) {
             println()
             println(correctAnswer.original)
 
-            for (i in 0..3) {
-                println("${i + 1} - ${questionWords[i].translate}")
-            }
+            val answerOptions = questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
+            println(answerOptions.joinToString("\n", "","\n----------\n0 - меню"))
             val answer = readln()
 
         } else {
