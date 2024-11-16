@@ -65,10 +65,10 @@ fun learnWord(dictionary: List<Word>) {
 
         if (notLearnedList.isNotEmpty()) {
             val questionWords = notLearnedList.shuffled().take(4)
-            val correctAnswer = questionWords.shuffled().take(1)
+            val correctAnswer = questionWords.random()
 
             println()
-            println(correctAnswer[0].original)
+            println(correctAnswer.original)
 
             for (i in 0..3) {
                 println("${i + 1} - ${questionWords[i].translate}")
