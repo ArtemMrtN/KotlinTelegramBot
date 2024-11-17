@@ -25,7 +25,7 @@ fun main() {
 
         val answer = readln().toIntOrNull()
         when (answer) {
-            1 -> println("Выбран пункт меню – Учить слова")
+            1 -> learnWord(dictionary)
             2 -> showStatistics(dictionary)
             0 -> return
             else -> println("Введите число 1, 2 или 0")
@@ -55,4 +55,29 @@ fun showStatistics(mutableList: MutableList<Word>) {
     val percent = learnedCount.toDouble() / totalCount.toDouble() * 100
 
     println("Выучено $learnedCount из $totalCount слов | ${percent.toInt()}%\n")
+}
+
+fun learnWord(dictionary: List<Word>) {
+
+    while (true) {
+
+        val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+
+        if (notLearnedList.isNotEmpty()) {
+            val questionWords = notLearnedList.shuffled().take(4)
+            val correctAnswer = questionWords.random()
+
+            println()
+            println(correctAnswer.original)
+
+            val answerOptions = questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
+            println(answerOptions.joinToString("\n", "","\n----------\n0 - меню"))
+            val answer = readln()
+
+        } else {
+            println("Все слова в словаре выучены")
+            return
+        }
+    }
+
 }

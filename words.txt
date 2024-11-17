@@ -1,3 +1,24 @@
 hello|привет|0
 dog|собака|3
 cat|кошка|0
+adult|взрослый|
+age|возраст|
+baby|малыш|
+birth|рождение|
+boy|мальчик|
+child|ребенок|
+childhood|детство|
+girl|девочка|
+human|человек|
+kid|ребенок|
+life|жизнь|
+maiden name|девичья фамилия|
+man|мужчина|
+name|имя|
+people|люди|
+person|человек|
+personality|личность|
+surname|фамилия|
+teenager|подросток|
+woman|женщина|
+youth|молодежь, молодость|
