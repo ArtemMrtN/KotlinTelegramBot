@@ -1,18 +1,21 @@
 package org.example
 
-import java.io.File
-
 data class Word(
     val original: String,
     val translate: String,
     var correctAnswersCount: Int = 0
 )
 
+fun Question.asConsoleString(): String {
+    val variants = this.variants
+        .mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
+        .joinToString("\n")
+    return this.correctAnswer.original + "\n" + variants + "\n----------\n0 - выйти в меню"
+}
+
 fun main() {
 
-    val wordsFile = File("words.txt")
-
-    val dictionary = loadDictionary(wordsFile)
+    val trainer = LearnWordsTrainer()
 
     while (true) {
         println(
@@ -25,72 +28,33 @@ fun main() {
 
         val answer = readln().toIntOrNull()
         when (answer) {
-            1 -> learnWord(dictionary, wordsFile)
-            2 -> showStatistics(dictionary)
+            1 -> {
+                while (true) {
+                    val question = trainer.getNextQuestion()
+
+                    if (question == null) {
+                        println("Все слова в словаре выучены")
+                        break
+                    } else {
+                        println(question.asConsoleString())
+
+                        val userAnswerInput = readln().toIntOrNull()
+                        if (userAnswerInput == 0) break
+
+                        if (trainer.checkAnswer(userAnswerInput?.minus(1))) {
+                            println("Правильно!\n")
+                        } else {
+                            println("Неправильно! ${question.correctAnswer.original} - это ${question.correctAnswer.translate}\n")
+                        }
+                    }
+                }
+            }
+            2 -> {
+                val statistics = trainer.getStatistic()
+                println("Выучено ${statistics.learnedWordList} из ${statistics.total} слов | ${statistics.percent}%\n")
+            }
             0 -> return
             else -> println("Введите число 1, 2 или 0")
         }
     }
-}
-
-fun loadDictionary(wordsFile: File): MutableList<Word> {
-    val dictionary: MutableList<Word> = mutableListOf()
-    val lines: List<String> = wordsFile.readLines()
-
-    for (line in lines) {
-        val line = line.split("|")
-        val word =
-            Word(original = line[0], translate = line[1], correctAnswersCount = line.getOrNull(2)?.toIntOrNull() ?: 0)
-        dictionary.add(word)
-    }
-    return dictionary
-}
-
-fun showStatistics(mutableList: MutableList<Word>) {
-    val totalCount = mutableList.size
-
-    val learnedWordList = mutableList.filter { it.correctAnswersCount >= 3 }
-    val learnedCount = learnedWordList.size
-
-    val percent = learnedCount.toDouble() / totalCount.toDouble() * 100
-
-    println("Выучено $learnedCount из $totalCount слов | ${percent.toInt()}%\n")
-}
-
-fun learnWord(dictionary: List<Word>, wordsFile: File) {
-
-    while (true) {
-
-        val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
-
-        if (notLearnedList.isNotEmpty()) {
-            val questionWords = notLearnedList.shuffled().take(4)
-            val correctAnswer = questionWords.random()
-            val correctAnswerId = questionWords.indexOf(correctAnswer) + 1
-
-            println()
-            println(correctAnswer.original)
-
-            val answerOptions = questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
-            println(answerOptions.joinToString("\n", "", "\n----------\n0 - меню"))
-            val userAnswerInput = readln().toIntOrNull()
-
-            if (userAnswerInput == correctAnswerId) {
-                println("Правильно!")
-                correctAnswer.correctAnswersCount++
-                saveDictionary(dictionary, wordsFile)
-            } else {
-                println("Неправильно! ${correctAnswer.original} – это ${correctAnswer.translate}")
-            }
-
-        } else {
-            println("Все слова в словаре выучены")
-            return
-        }
-    }
-}
-
-fun saveDictionary(dictionary: List<Word>, file: File) {
-    val lines = dictionary.map { "${it.original}|${it.translate}|${it.correctAnswersCount}" }
-    file.writeText(lines.joinToString("\n"))
 }
