@@ -1,24 +1,24 @@
 hello|привет|3
-dog|собака|3
-cat|кошка|3
-adult|взрослый|0
+dog|собака|0
+cat|кошка|0
+adult|взрослый|4
 age|возраст|0
-baby|малыш|1
-birth|рождение|2
-boy|мальчик|1
-child|ребенок|2
-childhood|детство|0
+baby|малыш|0
+birth|рождение|0
+boy|мальчик|0
+child|ребенок|0
+childhood|детство|4
 girl|девочка|0
-human|человек|2
-kid|ребенок|0
-life|жизнь|0
-maiden name|девичья фамилия|0
-man|мужчина|0
-name|имя|2
-people|люди|1
-person|человек|1
-personality|личность|0
-surname|фамилия|0
-teenager|подросток|2
-woman|женщина|2
-youth|молодежь, молодость|1
+human|человек|0
+kid|ребенок|3
+life|жизнь|4
+maiden name|девичья фамилия|3
+man|мужчина|4
+name|имя|4
+people|люди|3
+person|человек|4
+personality|личность|4
+surname|фамилия|3
+teenager|подросток|3
+woman|женщина|3
+youth|молодежь, молодость|3
