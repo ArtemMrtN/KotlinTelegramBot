@@ -13,7 +13,7 @@ data class Question(
     val correctAnswer: Word,
 )
 
-class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val countOfQuestionWords: Int = 4) {
+class LearnWordsTrainer(private val learnedAnswerCount: Int = LEARNED_ANSWER_COUNT, private val countOfQuestionWords: Int = COUNT_OF_QUESTION_WORDS) {
 
     private var question: Question? = null
 
@@ -90,3 +90,6 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         wordsFile.writeText(lines.joinToString("\n"))
     }
 }
+
+const val LEARNED_ANSWER_COUNT = 3
+const val COUNT_OF_QUESTION_WORDS = 4
