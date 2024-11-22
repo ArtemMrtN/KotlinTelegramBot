@@ -5,37 +5,10 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class TelegramBotService {
-    fun getUpdates(botToken: String, updateId: Int): String {
-
-        val urlUpdates = "https://api.telegram.org/bot$botToken/getUpdates?offset=$updateId"
-
-        val client: HttpClient = HttpClient.newBuilder().build()
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates)).build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        return response.body()
-
-    }
-
-    fun sendMessage(botToken: String, chatId: String?, text: String): String {
-
-        val urlUpdates = "https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatId&text=$text"
-
-        val client: HttpClient = HttpClient.newBuilder().build()
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates)).build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        return response.body()
-
-    }
-}
-
 fun main(args: Array<String>) {
 
-    val telegramBotService = TelegramBotService()
+    val telegramBotService = TelegramBotService(args)
 
-    val botToken = args[0]
     var updateId = 0
 
     val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
@@ -43,7 +16,7 @@ fun main(args: Array<String>) {
 
     while (true) {
         Thread.sleep(2000)
-        val updates: String = telegramBotService.getUpdates(botToken, updateId)
+        val updates: String = telegramBotService.getUpdates(updateId)
         println(updates)
 
         val startUpdateId = updates.lastIndexOf("update_id")
@@ -62,8 +35,10 @@ fun main(args: Array<String>) {
         val groupsChatId = matchResultChatId?.groups
         val chatId = groupsChatId?.get(2)?.value
 
-        val message: String = telegramBotService.sendMessage(botToken, chatId, text.toString())
+        val message: String = telegramBotService.sendMessage(chatId, text.toString())
         println(message)
     }
 
 }
+
+const val URL = "https://api.telegram.org/bot"
