@@ -5,9 +5,8 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class TelegramBotService(args: Array<String>) {
+class TelegramBotService(private val botToken: String) {
 
-    private val botToken = args[0]
     private val client: HttpClient = HttpClient.newBuilder().build()
 
     fun getUpdates(updateId: Int): String {

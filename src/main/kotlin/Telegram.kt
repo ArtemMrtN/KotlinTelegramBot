@@ -7,7 +7,9 @@ import java.net.http.HttpResponse
 
 fun main(args: Array<String>) {
 
-    val telegramBotService = TelegramBotService(args)
+    val botToken = args[0]
+
+    val telegramBotService = TelegramBotService(botToken)
 
     var updateId = 0
 
