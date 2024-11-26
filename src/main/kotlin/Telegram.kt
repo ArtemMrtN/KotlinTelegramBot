@@ -29,13 +29,13 @@ fun main(args: Array<String>) {
         lastUpdateId = updateId + 1
 
         val text = messageTextRegex.find(updates)?.groups?.get(1)?.value
-        val chatId = chatIdRegex.find(updates)?.groups?.get(2)?.value?.toInt()
+        val chatId = chatIdRegex.find(updates)?.groups?.get(2)?.value
         val data = dataRegex.find(updates)?.groups?.get(1)?.value
 
         if (text?.lowercase() == "/start" && chatId != null) {
             telegramBotService.sendMenu(chatId)
         }
-        if (data?.lowercase() == "statistics_clicked" && chatId != null) {
+        if (data?.lowercase() == STATISTICS_TITLE && chatId != null) {
             telegramBotService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%")
         }
     }
