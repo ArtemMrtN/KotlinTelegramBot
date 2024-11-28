@@ -32,12 +32,15 @@ fun main(args: Array<String>) {
         val chatId = chatIdRegex.find(updates)?.groups?.get(2)?.value ?: continue
         val data = dataRegex.find(updates)?.groups?.get(1)?.value
 
-        if (text?.lowercase() == "/start" && chatId != null) {
+        if (text?.lowercase() == "/start") {
             telegramBotService.sendMenu(chatId)
         }
-        if (data?.lowercase() == STATISTICS_TITLE && chatId != null) {
+        if (data?.lowercase() == STATISTICS_TITLE) {
             val statistic = trainer.getStatistic()
             telegramBotService.sendMessage(chatId, "Выучено ${statistic.learnedWordList} из ${statistic.total} слов | ${statistic.percent}%\n")
+        }
+        if (data?.lowercase() == LEARN_WORDS_TITLE) {
+            telegramBotService.checkNextQuestionAndSend(trainer, telegramBotService, chatId)
         }
     }
 
