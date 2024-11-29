@@ -80,7 +80,7 @@ class TelegramBotService(private val botToken: String) {
         val text = question.correctAnswer.original
         val variants = question.variants
             .mapIndexed { index, word ->
-                """{"text": "${index + 1} - ${word.translate}", "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$index"}"""
+                """[{"text": "${index + 1} - ${word.translate}", "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$index"}]"""
             }.joinToString(",")
         val sendQuestionBody = """
         {
@@ -88,9 +88,15 @@ class TelegramBotService(private val botToken: String) {
             "text": "$text",
             "reply_markup": {
                 "inline_keyboard": [
+                    
+                    $variants,
+                    
                     [
-                        $variants
-                    ]
+                        {
+                            "text": "В меню",
+                            "callback_data": "$MENU_BUTTON"
+                        }
+                    ]                    
                 ]
             }
         }
@@ -107,21 +113,10 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun checkNextQuestionAndSend(
-        trainer: LearnWordsTrainer,
-        telegramBotService: TelegramBotService,
-        chatId: String
-    ) {
-        val question = trainer.getNextQuestion()
 
-        if (question == null) {
-            println("Все слова в словаре выучены")
-        } else {
-            telegramBotService.sendQuestion(chatId, question)
-        }
-    }
 }
 
 const val LEARN_WORDS_TITLE = "learn_words_clicked"
 const val STATISTICS_TITLE = "statistics_clicked"
+const val MENU_BUTTON = "menu_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
