@@ -66,6 +66,10 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = LEARNED_ANSWER_COU
         } ?: false
     }
 
+    fun getCorrectAnswer(): Word? {
+        return question?.correctAnswer
+    }
+
     private fun loadDictionary(): MutableList<Word> {
         try {
             val dictionary: MutableList<Word> = mutableListOf()
