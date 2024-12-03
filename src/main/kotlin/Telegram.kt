@@ -44,8 +44,8 @@ fun main(args: Array<String>) {
         if (data?.lowercase() == LEARN_WORDS_TITLE) {
             checkNextQuestionAndSend(trainer, telegramBotService, chatId)
         }
-        if (data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX, true) == true) {
-            val userAnswerIndex = data.substringAfter("answer_").toInt()
+        if (data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
+            val userAnswerIndex = data.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toInt()
             if (trainer.checkAnswer(userAnswerIndex)) {
                 telegramBotService.sendMessage(chatId, CORRECT_ANSWER)
                 Thread.sleep(1000)

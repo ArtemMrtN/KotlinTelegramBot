@@ -9,7 +9,7 @@ boy|мальчик|1
 child|ребенок|2
 childhood|детство|4
 girl|девочка|0
-human|человек|1
+human|человек|2
 kid|ребенок|3
 life|жизнь|4
 maiden name|девичья фамилия|3
