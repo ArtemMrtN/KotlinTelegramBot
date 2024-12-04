@@ -38,9 +38,24 @@ fun main(args: Array<String>) {
         if (data?.lowercase() == STATISTICS_TITLE) {
             val statistic = trainer.getStatistic()
             telegramBotService.sendMessage(chatId, "Выучено ${statistic.learnedWordList} из ${statistic.total} слов | ${statistic.percent}%\n")
+            Thread.sleep(1000)
+            telegramBotService.sendMenu(chatId)
         }
         if (data?.lowercase() == LEARN_WORDS_TITLE) {
             checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+        }
+        if (data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
+            val userAnswerIndex = data.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toInt()
+            if (trainer.checkAnswer(userAnswerIndex)) {
+                telegramBotService.sendMessage(chatId, CORRECT_ANSWER)
+                Thread.sleep(1000)
+                checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+            } else {
+                val correctAnswer = trainer.getCorrectAnswer()
+                telegramBotService.sendMessage(chatId, "Неправильно! ${correctAnswer?.original} - это ${correctAnswer?.translate}")
+                Thread.sleep(1000)
+                checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+            }
         }
     }
 
@@ -54,10 +69,11 @@ fun checkNextQuestionAndSend(
     val question = trainer.getNextQuestion()
 
     if (question == null) {
-        println("Все слова в словаре выучены")
+        telegramBotService.sendMessage(chatId, "Все слова в словаре выучены")
     } else {
         telegramBotService.sendQuestion(chatId, question)
     }
 }
 
 const val URL = "https://api.telegram.org/bot"
+const val CORRECT_ANSWER = "Правильно!"
