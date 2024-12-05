@@ -53,6 +53,9 @@ class TelegramBotService(private val botToken: String) {
                     listOf(
                         InlineKeyboard(text = "Изучить слова", callbackData = LEARN_WORDS_TITLE),
                         InlineKeyboard(text = "Статистика", callbackData = STATISTICS_TITLE)
+                    ),
+                    listOf(
+                        InlineKeyboard(text = "Сбросить прогресс", callbackData = RESET_CLICKED)
                     )
                 )
             )
@@ -114,4 +117,5 @@ class TelegramBotService(private val botToken: String) {
 const val LEARN_WORDS_TITLE = "learn_words_clicked"
 const val STATISTICS_TITLE = "statistics_clicked"
 const val MENU_BUTTON = "menu_clicked"
+const val RESET_CLICKED = "reset_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
