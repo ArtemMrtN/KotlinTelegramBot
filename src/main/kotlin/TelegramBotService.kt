@@ -11,6 +11,10 @@ class TelegramBotService(private val botToken: String) {
 
     private val client: HttpClient = HttpClient.newBuilder().build()
 
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     fun getUpdates(updateId: Long): String {
 
         val urlUpdates = "$URL$botToken/getUpdates?offset=$updateId"
@@ -22,7 +26,10 @@ class TelegramBotService(private val botToken: String) {
 
     }
 
-    fun sendMessage(json: Json, chatId: Long, text: String): String {
+    fun sendMessage(
+        chatId: Long,
+        text: String
+    ): String {
         val urlUpdates = "$URL$botToken/sendMessage"
 
         val requestBody = SendMessageRequest(
@@ -41,21 +48,21 @@ class TelegramBotService(private val botToken: String) {
 
     }
 
-    fun sendMenu(json: Json, chatId: Long): String {
+    fun sendMenu(chatId: Long): String {
 
         val urlUpdates = "$URL$botToken/sendMessage"
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
-            text = "Основное меню",
+            text = MENU,
             replyMarkup = ReplyMarkup(
                 listOf(
                     listOf(
-                        InlineKeyboard(text = "Изучить слова", callbackData = LEARN_WORDS_TITLE),
-                        InlineKeyboard(text = "Статистика", callbackData = STATISTICS_TITLE)
+                        InlineKeyboard(text = LEARN_WORDS, callbackData = LEARN_WORDS_TITLE),
+                        InlineKeyboard(text = STATISTICS, callbackData = STATISTICS_TITLE)
                     ),
                     listOf(
-                        InlineKeyboard(text = "Сбросить прогресс", callbackData = RESET_CLICKED)
+                        InlineKeyboard(text = RESET, callbackData = RESET_CLICKED)
                     )
                 )
             )
@@ -73,7 +80,10 @@ class TelegramBotService(private val botToken: String) {
 
     }
 
-    fun sendQuestion(json: Json, chatId: Long, question: Question): String {
+    fun sendQuestion(
+        chatId: Long,
+        question: Question
+    ): String {
 
         val urlUpdates = "$URL$botToken/sendMessage"
 
@@ -91,7 +101,7 @@ class TelegramBotService(private val botToken: String) {
                         listOf(
                             listOf(
                                 InlineKeyboard(
-                                    text = "В меню",
+                                    text = ON_MENU,
                                     callbackData = MENU_BUTTON
                                 )
                             )
@@ -111,11 +121,4 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-
 }
-
-const val LEARN_WORDS_TITLE = "learn_words_clicked"
-const val STATISTICS_TITLE = "statistics_clicked"
-const val MENU_BUTTON = "menu_clicked"
-const val RESET_CLICKED = "reset_clicked"
-const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"

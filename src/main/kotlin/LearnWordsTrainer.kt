@@ -20,7 +20,7 @@ data class Question(
 )
 
 class LearnWordsTrainer(
-    private val fileName: String = "words.txt",
+    private val fileName: String = FILE_NAME,
     private val learnedAnswerCount: Int = LEARNED_ANSWER_COUNT,
     private val countOfQuestionWords: Int = COUNT_OF_QUESTION_WORDS
 ) {
@@ -77,7 +77,7 @@ class LearnWordsTrainer(
         try {
             val wordsFile = File(fileName)
             if (!wordsFile.exists()) {
-                File("words.txt").copyTo(wordsFile)
+                File(FILE_NAME).copyTo(wordsFile)
             }
             val dictionary: MutableList<Word> = mutableListOf()
             val lines: List<String> = wordsFile.readLines()
@@ -94,7 +94,7 @@ class LearnWordsTrainer(
             }
             return dictionary
         } catch (e: IndexOutOfBoundsException) {
-            throw IllegalStateException("Некорректный файл")
+            throw IllegalStateException(INCORRECT_FILE)
         }
     }
 
@@ -110,7 +110,5 @@ class LearnWordsTrainer(
         dictionary.forEach {it.correctAnswersCount = 0}
         saveDictionary()
     }
-}
 
-const val LEARNED_ANSWER_COUNT = 3
-const val COUNT_OF_QUESTION_WORDS = 4
+}
