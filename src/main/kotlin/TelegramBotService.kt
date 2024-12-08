@@ -2,6 +2,7 @@ package org.example
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -19,10 +20,17 @@ class TelegramBotService(private val botToken: String) {
 
         val urlUpdates = "$URL$botToken/getUpdates?offset=$updateId"
 
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates)).build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return try {
 
-        return response.body()
+            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates)).build()
+            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+            return response.body()
+
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues."
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message."
+        }
 
     }
 
@@ -39,12 +47,20 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-            .header("Content-type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        return try {
+
+            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+                .header("Content-type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+                .build()
+            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+            return response.body()
+
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues."
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message."
+        }
 
     }
 
@@ -70,13 +86,20 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-            .header("Content-type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return try {
 
-        return response.body()
+            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+                .header("Content-type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+                .build()
+            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+            return response.body()
+
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues."
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message."
+        }
 
     }
 
@@ -94,7 +117,8 @@ class TelegramBotService(private val botToken: String) {
                 listOf(question.variants.mapIndexed { index, word ->
                     listOf(
                         InlineKeyboard(
-                            text = "${index + 1} - ${word.translate}", callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
+                            text = "${index + 1} - ${word.translate}",
+                            callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
                         )
                     )
                 }).flatten() +
@@ -112,13 +136,20 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-            .header("Content-type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        println("Ответ от Telegram API: ${response.body()}")
-        return response.body()
+        return try {
+
+            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+                .header("Content-type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+                .build()
+            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+            return response.body()
+
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues."
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message."
+        }
     }
 
 }
