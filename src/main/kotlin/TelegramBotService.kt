@@ -22,13 +22,20 @@ class TelegramBotService(private val botToken: String) {
     fun getUpdates(updateId: Long): String {
 
         val urlUpdates = "$URL$botToken/getUpdates?offset=$updateId"
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+            .build()
 
-        return retry {
-
-            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-                .build()
-            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-            response.body()
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == 200) {
+                response.body()
+            } else {
+                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
+            }
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues. ${e.message}"
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message. ${e.message}"
         }
 
     }
@@ -45,16 +52,23 @@ class TelegramBotService(private val botToken: String) {
         )
 
         val requestBodyString = json.encodeToString(requestBody)
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+            .header("Content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+            .timeout(Duration.ofSeconds(15))
+            .build()
 
-        return retry {
-
-            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-                .header("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-                .build()
-            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-            response.body()
-
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == 200) {
+                response.body()
+            } else {
+                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
+            }
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues. ${e.message}"
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message. ${e.message}"
         }
 
     }
@@ -80,16 +94,23 @@ class TelegramBotService(private val botToken: String) {
         )
 
         val requestBodyString = json.encodeToString(requestBody)
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+            .header("Content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+            .timeout(Duration.ofSeconds(15))
+            .build()
 
-        return retry {
-
-            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-                .header("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-                .build()
-            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-            response.body()
-
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == 200) {
+                response.body()
+            } else {
+                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
+            }
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues. ${e.message}"
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message. ${e.message}"
         }
 
     }
@@ -126,37 +147,42 @@ class TelegramBotService(private val botToken: String) {
         println(requestBody)
 
         val requestBodyString = json.encodeToString(requestBody)
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+            .header("Content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+            .timeout(Duration.ofSeconds(15))
+            .build()
 
-        return retry {
-
-            val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
-                .header("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-                .build()
-            val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-            response.body()
-
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == 200) {
+                response.body()
+            } else {
+                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
+            }
+        } catch (e: IOException) {
+            "Error: Unable to send message due to network issues. ${e.message}"
+        } catch (e: Exception) {
+            "Error: Unexpected issue occurred while sending message. ${e.message}"
         }
     }
 
-    fun <T> retry(
-        maxAttempts: Int = 3,
-        delayMillis: Long = 2000,
-        action: () -> T
-    ): T {
-        var currentAttempt = 0
-        while (true) {
+    private fun sendRequestWithRetries(request: HttpRequest, retries: Int = 3): HttpResponse<String>? {
+        var attempt = 0
+        while (attempt < retries) {
             try {
-                return action()
+                println("Попытка ${attempt + 1}")
+                return client.send(request, HttpResponse.BodyHandlers.ofString())
             } catch (e: IOException) {
-                currentAttempt++
-                if (currentAttempt >= maxAttempts) {
-                    throw e // Если превышено количество попыток, выбрасываем исключение
+                println("Ошибка при попытке ${attempt + 1}: ${e.message}")
+                attempt++
+                if (attempt == retries) {
+                    println("Все попытки исчерпаны.")
+                    throw e
                 }
-                println("Retrying... ($currentAttempt/$maxAttempts)")
-                Thread.sleep(delayMillis) // Задержка между попытками
             }
         }
+        return null
     }
 
 }
