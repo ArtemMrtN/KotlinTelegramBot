@@ -7,13 +7,10 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.time.Duration
 
 class TelegramBotService(private val botToken: String) {
 
-    private val client: HttpClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(10))
-        .build()
+    private val client: HttpClient = HttpClient.newBuilder().build()
 
     val json = Json {
         ignoreUnknownKeys = true
@@ -24,19 +21,7 @@ class TelegramBotService(private val botToken: String) {
         val urlUpdates = "$URL$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .build()
-
-        return try {
-            val response = sendRequestWithRetries(request)
-            if (response != null && response.statusCode() == 200) {
-                response.body()
-            } else {
-                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
-            }
-        } catch (e: IOException) {
-            "Error: Unable to send message due to network issues. ${e.message}"
-        } catch (e: Exception) {
-            "Error: Unexpected issue occurred while sending message. ${e.message}"
-        }
+        return getResponseValue(request)
 
     }
 
@@ -55,21 +40,8 @@ class TelegramBotService(private val botToken: String) {
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .timeout(Duration.ofSeconds(15))
             .build()
-
-        return try {
-            val response = sendRequestWithRetries(request)
-            if (response != null && response.statusCode() == 200) {
-                response.body()
-            } else {
-                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
-            }
-        } catch (e: IOException) {
-            "Error: Unable to send message due to network issues. ${e.message}"
-        } catch (e: Exception) {
-            "Error: Unexpected issue occurred while sending message. ${e.message}"
-        }
+        return getResponseValue(request)
 
     }
 
@@ -97,21 +69,8 @@ class TelegramBotService(private val botToken: String) {
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .timeout(Duration.ofSeconds(15))
             .build()
-
-        return try {
-            val response = sendRequestWithRetries(request)
-            if (response != null && response.statusCode() == 200) {
-                response.body()
-            } else {
-                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
-            }
-        } catch (e: IOException) {
-            "Error: Unable to send message due to network issues. ${e.message}"
-        } catch (e: Exception) {
-            "Error: Unexpected issue occurred while sending message. ${e.message}"
-        }
+        return getResponseValue(request)
 
     }
 
@@ -150,39 +109,42 @@ class TelegramBotService(private val botToken: String) {
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
-            .timeout(Duration.ofSeconds(15))
             .build()
+        return getResponseValue(request)
 
-        return try {
-            val response = sendRequestWithRetries(request)
-            if (response != null && response.statusCode() == 200) {
-                response.body()
-            } else {
-                "Error: Failed to send message. Status: ${response?.statusCode() ?: "unknown"}, Body: ${response?.body() ?: "empty"}"
-            }
-        } catch (e: IOException) {
-            "Error: Unable to send message due to network issues. ${e.message}"
-        } catch (e: Exception) {
-            "Error: Unexpected issue occurred while sending message. ${e.message}"
-        }
     }
 
-    private fun sendRequestWithRetries(request: HttpRequest, retries: Int = 3): HttpResponse<String>? {
+    private fun sendRequestWithRetries(request: HttpRequest, retries: Int = HTTP_REQUEST_RETRIES): HttpResponse<String>? {
         var attempt = 0
         while (attempt < retries) {
             try {
-                println("Попытка ${attempt + 1}")
+                println("$TEXT_TRYING ${attempt + 1}")
                 return client.send(request, HttpResponse.BodyHandlers.ofString())
             } catch (e: IOException) {
-                println("Ошибка при попытке ${attempt + 1}: ${e.message}")
+                println("$TEXT_ERROR_TRYING ${attempt + 1}: ${e.message}")
                 attempt++
                 if (attempt == retries) {
-                    println("Все попытки исчерпаны.")
+                    println(TEXT_TRYING_EXHAUSTED)
                     throw e
                 }
             }
         }
         return null
+    }
+
+    private fun getResponseValue(request: HttpRequest): String {
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == RESPONSE_STATUS_CODE) {
+                response.body()
+            } else {
+                "$TEXT_ERROR_FAILED_SEND: ${response?.statusCode() ?: TEXT_UNKNOWN}"
+            }
+        } catch (e: IOException) {
+            "$TEXT_ERROR_UNABLE_SEND. ${e.message}"
+        } catch (e: Exception) {
+            "$TEXT_ERROR_UNEXPECTED. ${e.message}"
+        }
     }
 
 }
