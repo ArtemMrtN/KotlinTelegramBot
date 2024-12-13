@@ -2,6 +2,7 @@ package org.example
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -18,11 +19,9 @@ class TelegramBotService(private val botToken: String) {
     fun getUpdates(updateId: Long): String {
 
         val urlUpdates = "$URL$botToken/getUpdates?offset=$updateId"
-
-        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates)).build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        return response.body()
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
+            .build()
+        return getResponseValue(request)
 
     }
 
@@ -38,13 +37,11 @@ class TelegramBotService(private val botToken: String) {
         )
 
         val requestBodyString = json.encodeToString(requestBody)
-
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
             .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        return getResponseValue(request)
 
     }
 
@@ -69,14 +66,11 @@ class TelegramBotService(private val botToken: String) {
         )
 
         val requestBodyString = json.encodeToString(requestBody)
-
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
             .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-        return response.body()
+        return getResponseValue(request)
 
     }
 
@@ -94,7 +88,8 @@ class TelegramBotService(private val botToken: String) {
                 listOf(question.variants.mapIndexed { index, word ->
                     listOf(
                         InlineKeyboard(
-                            text = "${index + 1} - ${word.translate}", callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
+                            text = "${index + 1} - ${word.translate}",
+                            callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
                         )
                     )
                 }).flatten() +
@@ -111,14 +106,45 @@ class TelegramBotService(private val botToken: String) {
         println(requestBody)
 
         val requestBodyString = json.encodeToString(requestBody)
-
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlUpdates))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
             .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        println("Ответ от Telegram API: ${response.body()}")
-        return response.body()
+        return getResponseValue(request)
+
+    }
+
+    private fun sendRequestWithRetries(request: HttpRequest, retries: Int = HTTP_REQUEST_RETRIES): HttpResponse<String>? {
+        var attempt = 0
+        while (attempt < retries) {
+            try {
+                println("$TEXT_TRYING ${attempt + 1}")
+                return client.send(request, HttpResponse.BodyHandlers.ofString())
+            } catch (e: IOException) {
+                println("$TEXT_ERROR_TRYING ${attempt + 1}: ${e.message}")
+                attempt++
+                if (attempt == retries) {
+                    println(TEXT_TRYING_EXHAUSTED)
+                    throw e
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getResponseValue(request: HttpRequest): String {
+        return try {
+            val response = sendRequestWithRetries(request)
+            if (response != null && response.statusCode() == RESPONSE_STATUS_CODE) {
+                response.body()
+            } else {
+                "$TEXT_ERROR_FAILED_SEND: ${response?.statusCode() ?: TEXT_UNKNOWN}"
+            }
+        } catch (e: IOException) {
+            "$TEXT_ERROR_UNABLE_SEND. ${e.message}"
+        } catch (e: Exception) {
+            "$TEXT_ERROR_UNEXPECTED. ${e.message}"
+        }
     }
 
 }
