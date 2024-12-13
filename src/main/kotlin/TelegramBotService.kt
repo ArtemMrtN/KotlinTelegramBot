@@ -146,5 +146,4 @@ class TelegramBotService(private val botToken: String) {
             "$TEXT_ERROR_UNEXPECTED. ${e.message}"
         }
     }
-
 }
