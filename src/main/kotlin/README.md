@@ -22,3 +22,9 @@ English Learning Bot
 Подключиться к серверу по SSH используя команду ssh root@100.100.100.100 и введя пароль
 Запустить бота в фоне командой nohup java -jar bot.jar <ТОКЕН ТЕЛЕГРАМ> &
 Проверить работу бота
+
+
+systemctl restart english-learning-bot
+
+# просмотр логов
+journalctl -u english-learning-bot.service
