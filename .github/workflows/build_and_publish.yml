@@ -26,7 +26,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Rename file
-        run: mv build/libs/WordsTelegramBot-1.0-SNAPSHOT.jar bot.jar
+        run: mv build/libs/KotlinTelegramBot-1.0-SNAPSHOT.jar bot.jar
 
       - name: Deploy jar to VPS
         uses: appleboy/scp-action@master
